@@ -23,22 +23,22 @@
 | Silvia Juliana Suescún Garcés               |                                                                          |
 +---------------------------------------------+--------------------------------------------------------------------------+
 
-[^index-1]: Si desea obtener más información estadística académica de este documento de trabajo o de la Institución puede consultar el micrositio en el [Observatorio de Analítica Académica](https://udes.edu.co/ensenanza/dependencias/analitica-academica/observatorio) o por correo electrónico [direccionplaneacion\@udes.edu.co](mailto:analitica.academica@udes.edu.co) 
+[^index-1]: Si desea obtener más información estadística académica sobre este documento de trabajo o sobre la Institución, puede consultar el micrositio del [Observatorio de Analítica Académica](https://udes.edu.co/ensenanza/dependencias/analitica-academica/observatorio) o escribir al correo [direccionplaneacion\@udes.edu.co](mailto:direccionplaneacion@udes.edu.co).
 
 ::: {.callout-warning title="Para citar"}
-Pérez, M., León, F., y Pinto, L. (2026). Documento de Planeación Institucional No 4. Caracterización de estudiantes presenciales de pregrado recién ingreso periodo 2026-1. Universidad de Santander. Planeación Institucional. https://doi.org/10.5281/zenodo.19735820
+Pérez Pulido, M. O., León, F. J., y Pinto Guarguatí, L. A. (2026). *Caracterización de estudiantes presenciales de pregrado de recién ingreso, periodo 2026-1. Documento de Planeación Institucional n.º 4*. Universidad de Santander. https://doi.org/10.5281/zenodo.19735819
 :::
 
 ``` bibtex
-@techreport{PerezPulido2025,
-  author       = {Pérez, M. and León, F. and Pinto, L.},
-  title        = {Documento de Planeación Institucional No 4. Caracterización de estudiantes presenciales de pregrado recién ingreso periodo 2026-1},
+@techreport{PerezPulido2026,
+  author       = {Pérez Pulido, Miguel Oswaldo and León, Francisco Javier and Pinto Guarguatí, Leonardo Andrés},
+  title        = {Caracterización de estudiantes presenciales de pregrado de recién ingreso, periodo 2026-1. Documento de Planeación Institucional n.º 4},
   institution  = {Universidad de Santander (UDES)},
   year         = {2026},
-  note         = {Planeación Institucional. Disponible también en: \url{https://analiticaudes.github.io/alerta1_cx_2026-1/}},
+  note         = {Planeación Institucional. Disponible también en: \url{https://udesanalitica.github.io/alerta1_cx_2026-1/}},
   type         = {Informe técnico},
-  doi          = {10.5281/zenodo.19735820},
-  url          = {https://doi.org/10.5281/zenodo.19735820}
+  doi          = {10.5281/zenodo.19735819},
+  url          = {https://doi.org/10.5281/zenodo.19735819}
 }
 ```
 

@@ -8,7 +8,7 @@
 
 ## Descripción
 
-Este repsositorio contiene el sitio web generado con Quarto para la caracterización  de la cohorte 2026-1 de estudiantes de la Universidad de Santander (UDES). 
+Este repositorio contiene el sitio web generado con Quarto para la caracterización de la cohorte 2026-1 de estudiantes de la Universidad de Santander (UDES).
 Su objetivo es brindar una herramienta visual e interactiva para el análisis territorial de origen de los estudiantes, 
 apoyado en herramientas de ciencia de datos, georreferenciación y visualización avanzada.
 
@@ -74,7 +74,7 @@ Por favor cite el dataset y el reporte como se muestra
 
 ```bibtex
 @techreport{PerezPulido2026,
-  author       = {Pérez, M., León, F., y Pinto, L.},
+  author       = {Pérez Pulido, Miguel Oswaldo and León, Francisco Javier and Pinto Guarguatí, Leonardo Andrés},
   title        = {Documento de Planeación Institucional No 4. Caracterización de estudiantes presenciales de pregrado recién ingreso periodo 2026-1.},
   institution  = {Universidad de Santander (UDES)},
   year         = {2026},

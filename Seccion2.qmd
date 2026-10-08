@@ -56,6 +56,8 @@ invisible(lapply(paquetes, instalar_si_falta))
 
 # OPCIÓN A (BASE ORIGINAL - recomendada ahora)
 datos <- readxl::read_excel("data/data20261.xlsx")
+datos <- datos %>%
+  mutate(campus = recode(as.character(campus), "Bogota" = "Bogotá"))
 
 # OPCIÓN B (BASE LIMPIA - cuando estabilices pipeline)
 # if (!exists("datos")) {
@@ -70,7 +72,7 @@ dim(datos)
 ```
 
 ```{r, message=FALSE, warning=FALSE, include=TRUE, echo=FALSE}
-# Librerias necesarias
+# Librerías necesarias
 #install.packages(c("ggplot2", "psych", "skimr", "summarytools", "corrplot", "ggpubr"))
 library(ggplot2)
 library(psych)
@@ -95,7 +97,7 @@ library(scales)
 ```
 
 ```{r, message=FALSE, warning=FALSE, echo=FALSE}
-## Convertir las variables caracter a factor
+## Convertir las variables de tipo carácter a factor
 # Lista de columnas que se convertirán en factores
 cols_factor <- c(
   "tipo_doc","genero","campus","prog_acad","sexo_id","pais","est_civ",
@@ -124,8 +126,8 @@ cols_existentes <- intersect(cols_factor, names(datos))
 datos[cols_existentes] <- lapply(datos[cols_existentes], as.factor)
 ```
 
-::: {.callout-warning title="Aclaración importante"}
-En los gráficos y filtros, el nombre Cúcuta aparecerá como Cucuta.
+::: {.callout-note title="Nota sobre los campus"}
+Las visualizaciones presentan cuatro campus: Bucaramanga, Bogotá, Cúcuta y Valledupar. Los valores internos de la base se normalizan para mostrar correctamente sus nombres.
 :::
 
 ### Medio de transporte habitual de su casa a la universidad
@@ -148,7 +150,7 @@ datos_plot <- datos %>%
   filter(
     !is.na(campus),
     !is.na(transp_hab),
-    campus %in% c("Bucaramanga", "Cucuta", "Valledupar")
+    campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
   ) %>%
   mutate(
     transp_hab = str_trim(as.character(transp_hab))
@@ -165,7 +167,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Fijar niveles de campus
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir y calcular porcentajes por campus
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -178,6 +180,7 @@ datos_final <- bind_rows(datos_plot, todos) %>%
 colores_campus <- c(
   "Todos" = "#7AA6C9",
   "Bucaramanga" = "#A2CFFE",
+  "Bogotá" = "#D8B4FE",
   "Cucuta" = "#FFD1DC",
   "Valledupar" = "#AAF0D1"
 )
@@ -186,6 +189,7 @@ colores_campus <- c(
 etiquetas_campus <- c(
   "Todos" = "Todos",
   "Bucaramanga" = "Bucaramanga",
+  "Bogotá" = "Bogotá",
   "Cucuta" = "Cúcuta",
   "Valledupar" = "Valledupar"
 )
@@ -279,7 +283,7 @@ datos_plot <- datos %>%
   filter(
     !is.na(campus),
     !is.na(combust),
-    campus %in% c("Bucaramanga", "Cucuta", "Valledupar")
+    campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
   ) %>%
   mutate(
     combust = str_trim(as.character(combust))
@@ -296,7 +300,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Orden de campus
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir y calcular porcentajes
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -309,6 +313,7 @@ datos_final <- bind_rows(datos_plot, todos) %>%
 colores_campus <- c(
   "Todos" = "#7AA6C9",
   "Bucaramanga" = "#A2CFFE",
+  "Bogotá" = "#D8B4FE",
   "Cucuta" = "#FFD1DC",
   "Valledupar" = "#AAF0D1"
 )
@@ -316,6 +321,7 @@ colores_campus <- c(
 etiquetas_campus <- c(
   "Todos" = "Todos",
   "Bucaramanga" = "Bucaramanga",
+  "Bogotá" = "Bogotá",
   "Cucuta" = "Cúcuta",
   "Valledupar" = "Valledupar"
 )
@@ -404,7 +410,7 @@ library(RColorBrewer)
 
 # 1. Preparar los datos por campus y Comparte con otras personas durante el trayecto su medio de transporte habitual
 datos_plot <- datos %>%
-  filter(!is.na(campus), !is.na(transp_comp), campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+  filter(!is.na(campus), !is.na(transp_comp), campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, transp_comp) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -415,7 +421,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Fijar niveles de campus (con "Todos" primero)
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir todos los datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -477,7 +483,7 @@ library(RColorBrewer)
 
 # 1. Preparar los datos por campus y ¿Estaría dispuesto a compartir su medio de transporte?
 datos_plot <- datos %>%
-  filter(!is.na(campus), !is.na(comp_dispo), campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+  filter(!is.na(campus), !is.na(comp_dispo), campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, comp_dispo) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -488,7 +494,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Fijar niveles de campus (con "Todos" primero)
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir todos los datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -551,7 +557,7 @@ library(RColorBrewer)
 
 # 1. Preparar los datos por campus y tiempo de transporte
 datos_plot <- datos %>%
-  filter(!is.na(campus), !is.na(tiemp_trans), campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+  filter(!is.na(campus), !is.na(tiemp_trans), campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, tiemp_trans) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -562,7 +568,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Fijar niveles de campus (con "Todos" primero)
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir todos los datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -623,7 +629,7 @@ library(plotly)
 
 # 1. Preparar los datos por campus y Dinero en transporte, en promedio, semanal en desplazamiento
 datos_plot <- datos %>%
-  filter(!is.na(campus) & !is.na(din_trans) & campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+  filter(!is.na(campus) & !is.na(din_trans) & campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, din_trans) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -634,7 +640,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Fijar niveles de campus (con "Todos" primero)
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir todos los datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -727,7 +733,7 @@ library(plotly)
 
 # 1. Preparar los datos
 datos_plot <- datos %>%
-  filter(!is.na(campus) & !is.na(tip_familia) & campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+  filter(!is.na(campus) & !is.na(tip_familia) & campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, tip_familia) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -738,7 +744,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Orden de campus
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -765,6 +771,7 @@ datos_final <- datos_final %>%
 colores_campus <- c(
   "Todos" = "#7AA6C9",
   "Bucaramanga" = "#A2CFFE",
+  "Bogotá" = "#D8B4FE",
   "Cucuta" = "#FFD1DC",
   "Valledupar" = "#AAF0D1"
 )
@@ -772,6 +779,7 @@ colores_campus <- c(
 etiquetas_campus <- c(
   "Todos" = "Todos",
   "Bucaramanga" = "Bucaramanga",
+  "Bogotá" = "Bogotá",
   "Cucuta" = "Cúcuta",
   "Valledupar" = "Valledupar"
 )
@@ -854,7 +862,7 @@ library(plotly)
 
 # 1. Preparar los datos por campus y ¿Cuál es la tipologia familiar de origen?
 datos_plot <- datos %>%
-  filter(!is.na(campus) & !is.na(convive) & campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+  filter(!is.na(campus) & !is.na(convive) & campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, convive) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -865,7 +873,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Fijar niveles de campus (con "Todos" primero)
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir todos los datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -956,7 +964,7 @@ library(plotly)
 
 # 1. Preparar los datos por campus y En cuántos cuartos duermen las personas de su hogar
 datos_plot <- datos %>%
-  filter(!is.na(campus) & !is.na(cuartos) & campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+  filter(!is.na(campus) & !is.na(cuartos) & campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, cuartos) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -967,7 +975,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Fijar niveles de campus (con "Todos" primero)
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir todos los datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -1059,7 +1067,7 @@ library(RColorBrewer)
 
 # 1. Preparar los datos por campus y ¿Tiene hijos?
 datos_plot <- datos %>%
-  filter(!is.na(campus), !is.na(tiene_hijos), campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+  filter(!is.na(campus), !is.na(tiene_hijos), campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, tiene_hijos) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -1070,7 +1078,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Fijar niveles de campus (con "Todos" primero)
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir todos los datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -1136,7 +1144,7 @@ datos_plot <- datos %>%
   filter(
     !is.na(campus),
     !is.na(num_hijos),
-    campus %in% c("Bucaramanga", "Cucuta", "Valledupar")
+    campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
   ) %>%
   mutate(
     num_hijos = str_trim(as.character(num_hijos))
@@ -1153,7 +1161,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Orden de campus
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir y calcular porcentajes
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -1175,6 +1183,7 @@ datos_final <- datos_final %>%
 colores_campus <- c(
   "Todos" = "#7AA6C9",
   "Bucaramanga" = "#A2CFFE",
+  "Bogotá" = "#D8B4FE",
   "Cucuta" = "#FFD1DC",
   "Valledupar" = "#AAF0D1"
 )
@@ -1182,6 +1191,7 @@ colores_campus <- c(
 etiquetas_campus <- c(
   "Todos" = "Todos",
   "Bucaramanga" = "Bucaramanga",
+  "Bogotá" = "Bogotá",
   "Cucuta" = "Cúcuta",
   "Valledupar" = "Valledupar"
 )
@@ -1268,7 +1278,7 @@ library(RColorBrewer)
 
 # 1. Preparar los datos por campus y Grupos poblacionales
 datos_plot <- datos %>%
-  filter(!is.na(campus), !is.na(grupo_pobl), campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+  filter(!is.na(campus), !is.na(grupo_pobl), campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, grupo_pobl) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -1279,7 +1289,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Fijar niveles de campus (con "Todos" primero)
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir todos los datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -1348,7 +1358,7 @@ datos_plot <- datos %>%
   filter(
     !is.na(campus),
     !is.na(grupo_pert),
-    campus %in% c("Bucaramanga", "Cucuta", "Valledupar"),
+    campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar"),
     grupo_pert != "No pertenece a ningún grupo poblacional"
   ) %>%
   mutate(
@@ -1369,7 +1379,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Fijar niveles de campus
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -1396,6 +1406,7 @@ datos_final <- datos_final %>%
 colores_campus <- c(
   "Todos" = "#7AA6C9",
   "Bucaramanga" = "#A2CFFE",
+  "Bogotá" = "#D8B4FE",
   "Cucuta" = "#FFD1DC",
   "Valledupar" = "#AAF0D1"
 )
@@ -1403,6 +1414,7 @@ colores_campus <- c(
 etiquetas_campus <- c(
   "Todos" = "Todos",
   "Bucaramanga" = "Bucaramanga",
+  "Bogotá" = "Bogotá",
   "Cucuta" = "Cúcuta",
   "Valledupar" = "Valledupar"
 )
@@ -1495,7 +1507,7 @@ datos_plot <- datos %>%
   filter(
     !is.na(campus),
     !is.na(grupo_etn),
-    campus %in% c("Bucaramanga", "Cucuta", "Valledupar"),
+    campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar"),
     !grupo_etn %in% c("0", "Ninguno", "No pertenece", "", "No aplica")
   ) %>%
   count(campus, grupo_etn, name = "n")
@@ -1513,7 +1525,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Niveles de campus
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -1539,6 +1551,7 @@ datos_final <- datos_final %>%
 colores <- c(
   "Todos" = "#7AA6C9",
   "Bucaramanga" = "#A2CFFE",
+  "Bogotá" = "#D8B4FE",
   "Cucuta" = "#FFD1DC",
   "Valledupar" = "#AAF0D1"
 )
@@ -1546,6 +1559,7 @@ colores <- c(
 labels_campus <- c(
   "Todos" = "Todos",
   "Bucaramanga" = "Bucaramanga",
+  "Bogotá" = "Bogotá",
   "Cucuta" = "Cúcuta",
   "Valledupar" = "Valledupar"
 )
@@ -1636,7 +1650,7 @@ datos_plot <- datos %>%
   filter(
     !is.na(campus),
     !is.na(etnia_ind),
-    campus %in% c("Bucaramanga", "Cucuta", "Valledupar"),
+    campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar"),
     !etnia_ind %in% c("0", "Ninguno", "No pertenece", "", "No aplica")
   ) %>%
   count(campus, etnia_ind, name = "n")
@@ -1652,7 +1666,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Niveles de campus
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -1677,6 +1691,7 @@ datos_final <- datos_final %>%
 colores <- c(
   "Todos" = "#7AA6C9",
   "Bucaramanga" = "#A2CFFE",
+  "Bogotá" = "#D8B4FE",
   "Cucuta" = "#FFD1DC",
   "Valledupar" = "#AAF0D1"
 )
@@ -1684,6 +1699,7 @@ colores <- c(
 labels_campus <- c(
   "Todos" = "Todos",
   "Bucaramanga" = "Bucaramanga",
+  "Bogotá" = "Bogotá",
   "Cucuta" = "Cúcuta",
   "Valledupar" = "Valledupar"
 )
@@ -1771,7 +1787,7 @@ library(plotly)
 
 # 1. Preparar los datos por campus y ¿Quién cubre sus gastos de matrícula?
 datos_plot <- datos %>%
-  filter(!is.na(campus) & !is.na(gastos_mat) & campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+  filter(!is.na(campus) & !is.na(gastos_mat) & campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, gastos_mat) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -1782,7 +1798,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Fijar niveles de campus (con "Todos" primero)
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir todos los datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -1877,7 +1893,7 @@ datos_plot <- datos %>%
   filter(
     !is.na(campus),
     !is.na(pago_sem),
-    campus %in% c("Bucaramanga", "Cucuta", "Valledupar")
+    campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
   ) %>%
   mutate(
     pago_sem = str_trim(as.character(pago_sem))
@@ -1894,7 +1910,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Orden de campus
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -1921,6 +1937,7 @@ datos_final <- datos_final %>%
 colores_campus <- c(
   "Todos" = "#7AA6C9",
   "Bucaramanga" = "#A2CFFE",
+  "Bogotá" = "#D8B4FE",
   "Cucuta" = "#FFD1DC",
   "Valledupar" = "#AAF0D1"
 )
@@ -1928,6 +1945,7 @@ colores_campus <- c(
 etiquetas_campus <- c(
   "Todos" = "Todos",
   "Bucaramanga" = "Bucaramanga",
+  "Bogotá" = "Bogotá",
   "Cucuta" = "Cúcuta",
   "Valledupar" = "Valledupar"
 )
@@ -2073,7 +2091,7 @@ datos_plot <- datos %>%
   filter(
     !is.na(campus),
     !is.na(tiempo_ing),
-    campus %in% c("Bucaramanga", "Cucuta", "Valledupar")
+    campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
   ) %>%
   mutate(
     tiempo_ing = str_trim(as.character(tiempo_ing))
@@ -2090,7 +2108,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Orden de campus
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -2115,6 +2133,7 @@ datos_final <- datos_final %>%
 colores <- c(
   "Todos" = "#7AA6C9",
   "Bucaramanga" = "#A2CFFE",
+  "Bogotá" = "#D8B4FE",
   "Cucuta" = "#FFD1DC",
   "Valledupar" = "#AAF0D1"
 )
@@ -2122,6 +2141,7 @@ colores <- c(
 labels_campus <- c(
   "Todos" = "Todos",
   "Bucaramanga" = "Bucaramanga",
+  "Bogotá" = "Bogotá",
   "Cucuta" = "Cúcuta",
   "Valledupar" = "Valledupar"
 )
@@ -2208,7 +2228,7 @@ library(RColorBrewer)
 
 # 1. Preparar los datos por campus y ¿Usted es el primero en su familia inmediata en asistir a la universidad?
 datos_plot <- datos %>%
-  filter(!is.na(campus), !is.na(prim_univ), campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+  filter(!is.na(campus), !is.na(prim_univ), campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, prim_univ) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -2219,7 +2239,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Fijar niveles de campus (con "Todos" primero)
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir todos los datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -2285,7 +2305,7 @@ datos_plot <- datos %>%
   filter(
     !is.na(campus),
     !is.na(niv_padre),
-    campus %in% c("Bucaramanga", "Cucuta", "Valledupar")
+    campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
   ) %>%
   mutate(
     niv_padre = str_trim(as.character(niv_padre))
@@ -2302,7 +2322,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Orden de campus
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -2329,6 +2349,7 @@ datos_final <- datos_final %>%
 colores_campus <- c(
   "Todos" = "#7AA6C9",
   "Bucaramanga" = "#A2CFFE",
+  "Bogotá" = "#D8B4FE",
   "Cucuta" = "#FFD1DC",
   "Valledupar" = "#AAF0D1"
 )
@@ -2336,6 +2357,7 @@ colores_campus <- c(
 etiquetas_campus <- c(
   "Todos" = "Todos",
   "Bucaramanga" = "Bucaramanga",
+  "Bogotá" = "Bogotá",
   "Cucuta" = "Cúcuta",
   "Valledupar" = "Valledupar"
 )
@@ -2424,7 +2446,7 @@ datos_plot <- datos %>%
   filter(
     !is.na(campus),
     !is.na(niv_madre),
-    campus %in% c("Bucaramanga", "Cucuta", "Valledupar")
+    campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
   ) %>%
   mutate(
     niv_madre = str_trim(as.character(niv_madre))
@@ -2441,7 +2463,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Orden de campus
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -2468,6 +2490,7 @@ datos_final <- datos_final %>%
 colores_campus <- c(
   "Todos" = "#7AA6C9",
   "Bucaramanga" = "#A2CFFE",
+  "Bogotá" = "#D8B4FE",
   "Cucuta" = "#FFD1DC",
   "Valledupar" = "#AAF0D1"
 )
@@ -2475,6 +2498,7 @@ colores_campus <- c(
 etiquetas_campus <- c(
   "Todos" = "Todos",
   "Bucaramanga" = "Bucaramanga",
+  "Bogotá" = "Bogotá",
   "Cucuta" = "Cúcuta",
   "Valledupar" = "Valledupar"
 )
@@ -2560,7 +2584,7 @@ library(RColorBrewer)
 
 # 1. Preparar los datos por campus y ¿Cuenta su hogar con servicio de conexión a internet?
 datos_plot <- datos %>%
-  filter(!is.na(campus), !is.na(internet), campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+  filter(!is.na(campus), !is.na(internet), campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, internet) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -2571,7 +2595,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Fijar niveles de campus (con "Todos" primero)
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir todos los datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -2630,7 +2654,7 @@ library(RColorBrewer)
 
 # 1. Preparar los datos por campus y ¿Cuenta su hogar con servicio de suscripción de televisión (cable, parabólica o satelital)?
 datos_plot <- datos %>%
-  filter(!is.na(campus), !is.na(tv_suscrip), campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+  filter(!is.na(campus), !is.na(tv_suscrip), campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, tv_suscrip) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -2641,7 +2665,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Fijar niveles de campus (con "Todos" primero)
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir todos los datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -2700,7 +2724,7 @@ library(RColorBrewer)
 
 # 1. Preparar los datos por campus y ¿Cuántos libros físicos o electrónicos hay en su hogar excluyendo periódicos, revistas,directorios telefónicos y libros del colegio?
 datos_plot <- datos %>%
-  filter(!is.na(campus), !is.na(libros), campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+  filter(!is.na(campus), !is.na(libros), campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, libros) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -2711,7 +2735,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Fijar niveles de campus (con "Todos" primero)
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir todos los datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -2774,7 +2798,7 @@ library(RColorBrewer)
 
 # 1. Preparar los datos por campus y ¿cuánto tiempo al día dedica a leer por entretenimiento?
 datos_plot <- datos %>%
-  filter(!is.na(campus), !is.na(tiempo_lect), campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+  filter(!is.na(campus), !is.na(tiempo_lect), campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, tiempo_lect) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -2785,7 +2809,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Fijar niveles de campus (con "Todos" primero)
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir todos los datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -2850,7 +2874,7 @@ library(RColorBrewer)
 
 # 1. Preparar los datos por campus y ¿cuánto tiempo al día dedica a navegar en internet? Excluya actividades académica
 datos_plot <- datos %>%
-  filter(!is.na(campus), !is.na(tiemp_net), campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+  filter(!is.na(campus), !is.na(tiemp_net), campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, tiemp_net) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -2861,7 +2885,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Fijar niveles de campus (con "Todos" primero)
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir todos los datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -2924,7 +2948,7 @@ library(RColorBrewer)
 
 # 1. Preparar los datos por campus y ¿Dispone de un espacio privado para estudiar en casa?
 datos_plot <- datos %>%
-  filter(!is.na(campus), !is.na(esp_estud), campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+  filter(!is.na(campus), !is.na(esp_estud), campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, esp_estud) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -2935,7 +2959,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Fijar niveles de campus (con "Todos" primero)
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir todos los datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -2997,7 +3021,7 @@ library(RColorBrewer)
 
 # 1. Preparar los datos por campus y jornada de estudios en la Universidad
 datos_plot <- datos %>%
-  filter(!is.na(campus), !is.na(jorn_univ), campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+  filter(!is.na(campus), !is.na(jorn_univ), campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, jorn_univ) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -3008,7 +3032,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Fijar niveles de campus
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir todos los datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -3076,7 +3100,7 @@ datos_plot <- datos %>%
   filter(
     !is.na(campus),
     !is.na(tiemp_univ),
-    campus %in% c("Bucaramanga", "Cucuta", "Valledupar")
+    campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
   ) %>%
   group_by(campus, tiemp_univ) %>%
   summarise(n = n(), .groups = "drop")
@@ -3088,7 +3112,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Fijar niveles de campus
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir todos los datos
 datos_final <- bind_rows(datos_plot, todos) %>%

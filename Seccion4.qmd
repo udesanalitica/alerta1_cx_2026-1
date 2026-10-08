@@ -52,6 +52,8 @@ invisible(lapply(paquetes, instalar_si_falta))
 
 # OPCIÓN A (BASE ORIGINAL - recomendada ahora)
 datos <- readxl::read_excel("data/data20261.xlsx")
+datos <- datos %>%
+  mutate(campus = recode(as.character(campus), "Bogota" = "Bogotá"))
 
 # OPCIÓN B (BASE LIMPIA - cuando estabilices pipeline)
 # if (!exists("datos")) {
@@ -67,7 +69,7 @@ dim(datos)
 ```
 
 ```{r, message=FALSE, warning=FALSE, echo=FALSE}
-## Convertir las variables caracter a factor
+## Convertir las variables de tipo carácter a factor
 # Lista de columnas que se convertirán en factores
 cols_factor <- c(
   "tipo_doc","genero","campus","prog_acad","sexo_id","pais","est_civ",
@@ -96,8 +98,8 @@ cols_existentes <- intersect(cols_factor, names(datos))
 datos[cols_existentes] <- lapply(datos[cols_existentes], as.factor)
 ```
 
-::: {.callout-warning title="Aclaración importante"}
-En los gráficos y filtros, el nombre Cúcuta aparecerá como Cucuta.
+::: {.callout-note title="Nota sobre los campus"}
+Las visualizaciones presentan cuatro campus: Bucaramanga, Bogotá, Cúcuta y Valledupar. Los valores internos de la base se normalizan para mostrar correctamente sus nombres.
 :::
 
 ## Sección: Fomento de la cultura
@@ -128,7 +130,8 @@ palabras <- palabras[!palabras %in% c("otros", "ninguno", "ninguna", "etc")]
 # Paso 3: Crear tabla de frecuencia
 df_palabras <- data.frame(word = palabras) |> 
   count(word, name = "freq") |> 
-  arrange(desc(freq))
+  arrange(desc(freq)) |>
+  slice_head(n = 60)
 
 # Paso 4: Visualización con ggwordcloud
 set.seed(123)
@@ -152,7 +155,7 @@ library(RColorBrewer)
 
 # 1. Preparar los datos por campus y ¿Cuenta con alguna habilidad artística?
 datos_plot <- datos %>%
-  filter(!is.na(campus), !is.na(hab_art), campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+  filter(!is.na(campus), !is.na(hab_art), campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, hab_art) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -163,7 +166,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Fijar niveles de campus (con "Todos" primero)
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir todos los datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -270,7 +273,7 @@ library(RColorBrewer)
 
 # 1. Preparar los datos por campus y ¿Padece de alguna enfermedad diagnosticada que requiere tratamiento actualmente?
 datos_plot <- datos %>%
-  filter(!is.na(campus), !is.na(aprend_art), campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+  filter(!is.na(campus), !is.na(aprend_art), campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, aprend_art) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -281,7 +284,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Fijar niveles de campus (con "Todos" primero)
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir todos los datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -336,7 +339,7 @@ library(plotly)
 
 # 1. Preparar los datos por campus y Edad de inicio del consumo de alcohol por primera vez
 datos_plot <- datos %>%
-  filter(!is.na(campus) & !is.na(dia_art) & campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+  filter(!is.na(campus) & !is.na(dia_art) & campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, dia_art) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -347,7 +350,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Fijar niveles de campus (con "Todos" primero)
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir todos los datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -473,7 +476,7 @@ library(RColorBrewer)
 
 # 1. Preparar los datos por campus y ¿Realiza actividad física?
 datos_plot <- datos %>%
-  filter(!is.na(campus), !is.na(act_fisica), campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+  filter(!is.na(campus), !is.na(act_fisica), campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, act_fisica) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -484,7 +487,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Fijar niveles de campus (con "Todos" primero)
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir todos los datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -542,7 +545,7 @@ library(RColorBrewer)
 # 1. Preparar los datos por campus y ¿Cuántas veces a la semana realiza actividad física?
 datos_plot <- datos %>%
   filter(!is.na(campus), !is.na(freq_fis
-), campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+), campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, freq_fis) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -553,7 +556,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Fijar niveles de campus (con "Todos" primero)
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir todos los datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -599,7 +602,7 @@ fig
 ### Su tiempo libre lo dedica, generalmente a:
 
 ::: {.callout-note title="Descripción para todos los campus"}
-Llas actividades de tiempo libre más mencionadas por los estudiantes son **salir con los amigos** y **navegar en internet**, seguidas de **ir al gimnasio** y **chatear e interactuar en redes sociales**. En menor proporción aparecen otras actividades como **ir a cine** u opciones agrupadas en la categoría “otras”. En conjunto, estos resultados evidencian una marcada preferencia por actividades sociales, digitales y de autocuidado físico dentro de la dinámica cotidiana del estudiantado.
+Las actividades de tiempo libre más mencionadas por los estudiantes son **salir con los amigos** y **navegar en internet**, seguidas de **ir al gimnasio** y **chatear e interactuar en redes sociales**. En menor proporción aparecen otras actividades como **ir a cine** u opciones agrupadas en la categoría “otras”. En conjunto, estos resultados evidencian una marcada preferencia por actividades sociales, digitales y de autocuidado físico dentro de la dinámica cotidiana del estudiantado.
 :::
 
 ```{r, message=FALSE, warning=FALSE, echo=FALSE, fig.width=10, fig.height=6}
@@ -621,7 +624,8 @@ palabras <- palabras[!palabras %in% c("otros", "ninguno", "ninguna", "etc")]
 df_palabras <- data.frame(word = palabras) |> 
   count(word, name = "freq") |> 
   filter(freq >= 2) |>  # Mostrar palabras que aparecen al menos dos veces
-  arrange(desc(freq))
+  arrange(desc(freq)) |>
+  slice_head(n = 60)
 
 # Paso 3: Visualización
 set.seed(123)
@@ -629,7 +633,7 @@ mis_colores <- c("#1f77b4", "#ff7f0e", "#2ca02c", "#d62728",
                  "#9467bd", "#8c564b", "#e377c2", "#7f7f7f")
 
 ggplot(df_palabras, aes(label = word, size = freq, color = word)) +
-  geom_text_wordcloud_area(grid_size = 1, rm_outside = TRUE) +
+  geom_text_wordcloud_area(grid_size = 4, rm_outside = TRUE) +
   scale_size_area(max_size = 100) +
   scale_color_manual(values = rep(mis_colores, length.out = nrow(df_palabras))) +
   theme_minimal()
@@ -712,7 +716,7 @@ library(RColorBrewer)
 
 # 1. Preparar los datos por campus y ¿Le gusta la lectura?
 datos_plot <- datos %>%
-  filter(!is.na(campus), !is.na(lectura), campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+  filter(!is.na(campus), !is.na(lectura), campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, lectura) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -723,7 +727,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Fijar niveles de campus (con "Todos" primero)
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir todos los datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -779,7 +783,7 @@ library(RColorBrewer)
 
 # 1. Preparar los datos por campus y ¿Cuántos libros lee al año?
 datos_plot <- datos %>%
-  filter(!is.na(campus), !is.na(libros), campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+  filter(!is.na(campus), !is.na(libros), campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, libros) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -790,7 +794,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Fijar niveles de campus (con "Todos" primero)
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir todos los datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -847,7 +851,7 @@ library(RColorBrewer)
 
 # 1. Preparar los datos por campus y ¿Practica algún deporte?
 datos_plot <- datos %>%
-  filter(!is.na(campus), !is.na(deporte), campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+  filter(!is.na(campus), !is.na(deporte), campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, deporte) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -858,7 +862,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Fijar niveles de campus (con "Todos" primero)
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir todos los datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -1060,7 +1064,7 @@ library(plotly)
 # 1. Preparar los datos
 datos_plot <- datos %>%
   filter(!is.na(campus), !is.na(salud_ment),
-         campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+         campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, salud_ment) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -1071,7 +1075,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Unir
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 datos_final <- bind_rows(datos_plot, todos) %>%
   mutate(campus = factor(campus, levels = niveles_campus))
@@ -1139,68 +1143,28 @@ fig
 ### ¿Siente apoyo emocional por parte de su familia?
 
 ::: {.callout-note title="Descripción para todos los campus"}
-La gran mayoría de **los estudiantes (93,7%) asegura recibir apoyo emocional de su familia**, mientras que un **6.2% indica no contar con este respaldo**. Este alto porcentaje de acompañamiento familiar constituye un factor protector clave, al reforzar el bienestar emocional y académico de los estudiantes.
+La gran mayoría de **los estudiantes (93,7 %) asegura recibir apoyo emocional de su familia**, mientras que un **6,2 % indica no contar con este respaldo**. Este alto porcentaje de acompañamiento familiar constituye un factor protector clave, al reforzar el bienestar emocional y académico de los estudiantes.
 :::
 
 ```{r, message=FALSE, warning=FALSE, include=TRUE, echo=FALSE}
 library(dplyr)
-library(plotly)
-library(RColorBrewer)
-
-# 1. Preparar los datos por campus y ¿Siente apoyo emocional por parte de su familia?
 datos_plot <- datos %>%
-  filter(!is.na(campus), !is.na(apoyo_fam), campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
-  group_by(campus, apoyo_fam) %>%
-  summarise(n = n(), .groups = "drop")
+  filter(
+    !is.na(campus),
+    !is.na(apoyo_fam),
+    campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
+  ) %>%
+  count(campus, apoyo_fam, name = "n") %>%
+  group_by(campus) %>%
+  mutate(porcentaje = n / sum(n)) %>%
+  ungroup()
 
-# 2. Agregar grupo "Todos"
-todos <- datos %>%
-  filter(!is.na(apoyo_fam)) %>%
-  count(apoyo_fam, name = "n") %>%
-  mutate(campus = "Todos")
-
-# 3. Fijar niveles de campus (con "Todos" primero)
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
-
-# 4. Unir todos los datos
-datos_final <- bind_rows(datos_plot, todos) %>%
-  mutate(campus = factor(campus, levels = niveles_campus))
-
-# 5. Crear gráfico de pastel con filtro
-fig <- plot_ly(
-  data = datos_final,
-  labels = ~apoyo_fam,
-  values = ~n,
-  type = "pie",
-  textinfo = "label+percent",
-  hoverinfo = "label+percent+value",
-  marker = list(colors = brewer.pal(8, "Pastel1")),
-  rotation = 270,
-  transforms = list(
-    list(
-      type = 'filter',
-      target = ~campus,
-      operation = '=',
-      value = "Todos"
-    )
-  )
-) %>%
-  layout(
-    title = " ",
-    updatemenus = list(
-      list(
-        type = 'dropdown',
-        active = 0,
-        buttons = lapply(niveles_campus, function(c) {
-          list(method = "restyle",
-               args = list("transforms.0.value", c),
-               label = c)
-        })
-      )
-    )
-  )
-
-fig
+ggplot(datos_plot, aes(x = campus, y = porcentaje, fill = apoyo_fam)) +
+  geom_col(position = "fill") +
+  scale_y_continuous(labels = scales::label_percent(decimal.mark = ",")) +
+  scale_fill_brewer(palette = "Pastel1", name = "Respuesta") +
+  labs(x = NULL, y = "Porcentaje", title = "Apoyo emocional familiar por campus") +
+  theme_minimal()
 ```
 
 ### ¿Quiénes considera que son sus redes de apoyo actualmente?
@@ -1237,7 +1201,7 @@ df_palabras <- data.frame(word = palabras) |>
 paleta <- brewer.pal(8, "Dark2")  # Otras: "Set1", "Paired", "Pastel1"
 
 ggplot(df_palabras, aes(label = word, size = freq, color = word)) +
-  geom_text_wordcloud_area(grid_size = 1, rm_outside = TRUE) +
+  geom_text_wordcloud_area(grid_size = 4, rm_outside = TRUE) +
   scale_size_area(max_size = 120) +
   scale_color_manual(values = rep(paleta, length.out = nrow(df_palabras))) +
   theme_minimal()
@@ -1256,7 +1220,7 @@ library(RColorBrewer)
 
 # 1. Preparar los datos por campus y ¿Tiene actualmente pareja sentimental?
 datos_plot <- datos %>%
-  filter(!is.na(campus), !is.na(pareja), campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+  filter(!is.na(campus), !is.na(pareja), campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, pareja) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -1267,7 +1231,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Fijar niveles de campus (con "Todos" primero)
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir todos los datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -1337,14 +1301,15 @@ palabras <- palabras[!palabras %in% c("otros", "ninguno", "ninguna", "etc")]
 # Paso 3: Crear tabla de frecuencia
 df_palabras <- data.frame(word = palabras) |> 
   count(word, name = "freq") |> 
-  arrange(desc(freq))
+  arrange(desc(freq)) |>
+  slice_head(n = 60)
 
 # Paso 4: Visualización con ggwordcloud
 # Usar una paleta predefinida de RColorBrewer
 paleta <- brewer.pal(8, "Dark2")  # Otras: "Set1", "Paired", "Pastel1"
 
 ggplot(df_palabras, aes(label = word, size = freq, color = word)) +
-  geom_text_wordcloud_area(grid_size = 1, rm_outside = TRUE) +
+  geom_text_wordcloud_area(grid_size = 4, rm_outside = TRUE) +
   scale_size_area(max_size = 120) +
   scale_color_manual(values = rep(paleta, length.out = nrow(df_palabras))) +
   theme_minimal()
@@ -1363,7 +1328,7 @@ library(RColorBrewer)
 
 # 1. Preparar los datos por campus y ¿Cómo considera su relación con sus padres (con quien conviva-madre o padre)
 datos_plot <- datos %>%
-  filter(!is.na(campus), !is.na(rel_padres), campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+  filter(!is.na(campus), !is.na(rel_padres), campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, rel_padres) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -1374,7 +1339,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Fijar niveles de campus (con "Todos" primero)
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir todos los datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -1431,7 +1396,7 @@ library(plotly)
 # 1. Preparar los datos
 datos_plot <- datos %>%
   filter(!is.na(campus), !is.na(fam_origen),
-         campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+         campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, fam_origen) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -1442,7 +1407,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Unir datos
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 datos_final <- bind_rows(datos_plot, todos) %>%
   mutate(campus = factor(campus, levels = niveles_campus))
@@ -1525,7 +1490,7 @@ library(plotly)
 # 1. Preparar los datos
 datos_plot <- datos %>%
   filter(!is.na(campus), !is.na(fam_formada),
-         campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+         campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, fam_formada) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -1536,7 +1501,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Unir datos
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 datos_final <- bind_rows(datos_plot, todos) %>%
   mutate(campus = factor(campus, levels = niveles_campus))

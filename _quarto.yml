@@ -50,6 +50,7 @@ format:
     reference-location: document
     cite-method: citeproc
     include-in-header: header.html
+    include-after-body: footer.html
     page-layout: article
 
 crossref:

@@ -1,5 +1,5 @@
 ---
-title: "Sección 1. Información personal y Académica"
+title: "Sección 1. Información personal y académica"
 format: html
 ---
 
@@ -52,6 +52,8 @@ invisible(lapply(paquetes, instalar_si_falta))
 
 # OPCIÓN A (BASE ORIGINAL - recomendada ahora)
 datos <- readxl::read_excel("data/data20261.xlsx")
+datos <- datos %>%
+  mutate(campus = recode(as.character(campus), "Bogota" = "Bogotá"))
 
 # OPCIÓN B (BASE LIMPIA - cuando estabilices pipeline)
 # if (!exists("datos")) {
@@ -67,7 +69,7 @@ dim(datos)
 ```
 
 ```{r, message=FALSE, warning=FALSE, include=TRUE, echo=FALSE}
-# Librerias necesarias
+# Librerías necesarias
 #install.packages(c("ggplot2", "psych", "skimr", "summarytools", "corrplot", "ggpubr", "Hmisc", "yaml"))
 library(ggplot2)
 library(psych)
@@ -94,7 +96,7 @@ library(htmltools)
 ```
 
 ```{r, message=FALSE, warning=FALSE, echo=FALSE}
-## Convertir las variables caracter a factor
+## Convertir las variables de tipo carácter a factor
 # Lista de columnas que se convertirán en factores
 cols_factor <- c(
   "tipo_doc", "genero", "depto", "ciudad", "barrio", "estrato...12",
@@ -126,8 +128,8 @@ datos[cols_existentes] <- lapply(datos[cols_existentes], as.factor)
 
 ## Sección. Información personal y académica
 
-::: {.callout-warning title="Aclaración importante"}
-En los gráficos y filtros, el nombre Cúcuta aparecerá como Cucuta.
+::: {.callout-note title="Nota sobre los campus"}
+Las visualizaciones presentan cuatro campus: Bucaramanga, Bogotá, Cúcuta y Valledupar. Los valores internos de la base se normalizan para mostrar correctamente sus nombres.
 :::
 
 ## Distribución geográfica
@@ -147,23 +149,27 @@ library(readxl)
 # --- 1) Cargar y preparar datos ---
 
 # Leer shapefile de todos los municipios de Colombia
-colombia <- suppressMessages(
-  st_read("https://raw.githubusercontent.com/santiblanko/colombia.geojson/master/mpio.json")
+colombia <- st_read(
+  "https://raw.githubusercontent.com/santiblanko/colombia.geojson/master/mpio.json",
+  quiet = TRUE
 )
 
-# Leer y preparar datos de estudiantes
-ciudades <- read_delim(
-  "data/ciudades.csv",
-  delim = ";",
-  locale = locale(encoding = "Latin1"),
-  show_col_types = FALSE
-)
-
-names(ciudades) <- str_replace_all(names(ciudades), "[\r\n\t]", "")
-
-# Crear MPIO_CCDGO en los datos de estudiantes para la unión
-ciudades <- ciudades %>%
-  mutate(MPIO_CCDGO = str_pad(paste0(DPTO_CCDGO, MPIO), 5, pad = "0"))
+# Asignar cada municipio al campus con más estudiantes de la cohorte.
+# Este cálculo usa únicamente códigos geográficos y conteos agregados.
+ciudades <- datos %>%
+  transmute(
+    MPIO_CCDGO = str_pad(as.character(MPIO_CCDGO), 5, pad = "0"),
+    campus = as.character(campus)
+  ) %>%
+  filter(
+    !is.na(MPIO_CCDGO),
+    MPIO_CCDGO != "00000",
+    campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
+  ) %>%
+  count(MPIO_CCDGO, campus, name = "estudiantes") %>%
+  group_by(MPIO_CCDGO) %>%
+  slice_max(estudiantes, n = 1, with_ties = FALSE) %>%
+  ungroup()
 
 # Crear MPIO_CCDGO en el mapa
 colombia <- colombia %>%
@@ -230,6 +236,7 @@ ggplot() +
     values = c(
       "Cucuta" = "#FFD1DC",
       "Bucaramanga" = "#A2CFFE",
+      "Bogotá" = "#D8B4FE",
       "Valledupar" = "#AAF0D1"
     ),
     name = "Campus UDES"
@@ -244,7 +251,7 @@ ggplot() +
   ) +
   theme_minimal() +
   labs(
-    title = "Municipios de origen de los estudiantes",
+    title = "Municipios de origen de los estudiantes por campus",
     caption = "Fuente: Planeación Institucional UDES, 2026-1"
   )
 ```
@@ -256,7 +263,7 @@ ggplot() +
 ### Edad
 
 ::: {.callout-note title="Descripción para todos los campus"}
-La mayor parte de los estudiantes de recien ingreso se concentra en edades jóvenes. En particular, los intervalos de 16 a 18 años y de 18 a 20 años representan más de la mitad de la población estudiantil, lo que evidencia que el acceso a la universidad se da principalmente en la etapa inmediatamente posterior al bachillerato. En contraste, a medida que aumenta la edad, la proporción de estudiantes disminuye de manera considerable, siendo pocos estudiantes en los grupos de 30 años en adelante.
+La mayor parte de los estudiantes de recién ingreso se concentra en edades jóvenes. En particular, los intervalos de 16 a 18 años y de 18 a 20 años representan más de la mitad de la población estudiantil, lo que evidencia que el acceso a la universidad se da principalmente en la etapa inmediatamente posterior al bachillerato. En contraste, a medida que aumenta la edad, la proporción de estudiantes disminuye de manera considerable; son pocos los estudiantes de 30 años o más.
 :::
 
 ```{r, message=FALSE, warning=FALSE, include=TRUE, echo=FALSE}
@@ -266,9 +273,11 @@ library(dplyr)
 library(plotly)
 
 # Asumiendo que tu dataframe se llama 'datos'
-datos <- read_excel("C:/R-Proyectos/alerta1_cx_2026-1/data/data20261.xlsx")
+datos <- read_excel("data/data20261.xlsx")
+datos <- datos %>%
+  mutate(campus = recode(as.character(campus), "Bogota" = "Bogotá"))
 # --- 0. Definir los campus de interés ---
-campus_a_incluir <- c("Bucaramanga", "Cucuta", "Valledupar")
+campus_a_incluir <- c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # --- 1. Preparación y Limpieza de Datos ---
 datos_limpios <- datos %>%
@@ -310,7 +319,7 @@ todos <- datos_limpios %>%
 
 # --- 4. Combinar Datos y Preparar para el Gráfico ---
 # **AJUSTE:** Definimos manualmente el orden y contenido del menú desplegable.
-niveles_ordenados <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar") # <-- LÍNEA MODIFICADA
+niveles_ordenados <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar") # <-- LÍNEA MODIFICADA
 
 # Unimos los datos por campus con los datos totales.
 datos_final <- bind_rows(por_campus, todos) %>%
@@ -380,7 +389,7 @@ datos_todos <- datos %>%
 datos_final <- bind_rows(datos, datos_todos)
 
 # Niveles de campus
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # Crear gráfico base con todas las trazas (una por campus)
 fig <- plot_ly()
@@ -453,7 +462,7 @@ datos_plot <- datos %>%
   filter(
     !is.na(campus),
     !is.na(est_civ),
-    campus %in% c("Bucaramanga", "Cucuta", "Valledupar")
+    campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
   ) %>%
   count(campus, est_civ, name = "n")
 
@@ -489,7 +498,7 @@ agrupar_otros <- function(df, top_n = 10) {
 # =========================
 # 3. Calcular porcentaje por campus
 # =========================
-campus_ordenados <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+campus_ordenados <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 lista_datos <- lapply(campus_ordenados, function(camp) {
   datos_final %>%
@@ -619,7 +628,7 @@ library(RColorBrewer)
 
 # 1. Preparar los datos por campus y sexo
 datos_plot <- datos %>%
-  filter(!is.na(campus), !is.na(genero), campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+  filter(!is.na(campus), !is.na(genero), campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, genero) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -630,7 +639,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Fijar niveles de campus (con "Todos" primero)
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir todos los datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -692,7 +701,7 @@ datos_plot <- datos %>%
   filter(
     !is.na(campus),
     !is.na(pais),
-    campus %in% c("Bucaramanga", "Cucuta", "Valledupar")
+    campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
   ) %>%
   count(campus, pais, name = "n")
 
@@ -728,7 +737,7 @@ agrupar_otros <- function(df, top_n = 10) {
 # =========================
 # 3. Calcular porcentaje por campus
 # =========================
-campus_ordenados <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+campus_ordenados <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 lista_datos <- lapply(campus_ordenados, function(camp) {
   datos_final %>%
@@ -1275,7 +1284,7 @@ library(RColorBrewer)
 
 # 1. Preparar los datos por campus y desempeño académico
 datos_plot <- datos %>%
-  filter(!is.na(campus), !is.na(desemp_aca), campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+  filter(!is.na(campus), !is.na(desemp_aca), campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, desemp_aca) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -1286,7 +1295,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Fijar niveles de campus (con "Todos" primero)
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir todos los datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -1547,7 +1556,7 @@ library(RColorBrewer)
 
 # 1. Preparar los datos por campus y Cuándo hablo en público
 datos_plot <- datos %>%
-  filter(!is.na(campus), !is.na(hab_pub), campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+  filter(!is.na(campus), !is.na(hab_pub), campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, hab_pub) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -1558,7 +1567,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Fijar niveles de campus (con "Todos" primero)
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir todos los datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -1616,7 +1625,7 @@ library(RColorBrewer)
 
 # 1. Preparar los datos por campus y He realizado estudios de oratoria
 datos_plot <- datos %>%
-  filter(!is.na(campus), !is.na(est_orat), campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+  filter(!is.na(campus), !is.na(est_orat), campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, est_orat) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -1627,7 +1636,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Fijar niveles de campus (con "Todos" primero)
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir todos los datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -1684,7 +1693,7 @@ library(RColorBrewer)
 
 # 1. Preparar los datos por campus y Me siento cómodo en mi grupo de amigos
 datos_plot <- datos %>%
-  filter(!is.na(campus), !is.na(expr_amig), campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+  filter(!is.na(campus), !is.na(expr_amig), campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, expr_amig) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -1695,7 +1704,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Fijar niveles de campus (con "Todos" primero)
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir todos los datos
 datos_final <- bind_rows(datos_plot, todos) %>%
@@ -1752,7 +1761,7 @@ library(RColorBrewer)
 
 # 1. Preparar los datos por campus y Cuando conozco nuevas personas
 datos_plot <- datos %>%
-  filter(!is.na(campus), !is.na(comp_nvos), campus %in% c("Bucaramanga", "Cucuta", "Valledupar")) %>%
+  filter(!is.na(campus), !is.na(comp_nvos), campus %in% c("Bucaramanga", "Bogotá", "Cucuta", "Valledupar")) %>%
   group_by(campus, comp_nvos) %>%
   summarise(n = n(), .groups = "drop")
 
@@ -1763,7 +1772,7 @@ todos <- datos %>%
   mutate(campus = "Todos")
 
 # 3. Fijar niveles de campus (con "Todos" primero)
-niveles_campus <- c("Todos", "Bucaramanga", "Cucuta", "Valledupar")
+niveles_campus <- c("Todos", "Bucaramanga", "Bogotá", "Cucuta", "Valledupar")
 
 # 4. Unir todos los datos
 datos_final <- bind_rows(datos_plot, todos) %>%

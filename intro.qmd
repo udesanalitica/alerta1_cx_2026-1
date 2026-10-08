@@ -20,7 +20,7 @@ El modelo de caracterización 2026-1 se fundamenta en una estructura técnica de
 
 Lo más relevante en esta edición es la profundización en la dimensión de Salud y Desarrollo Humano (P107 a P114), diseñada para detectar alertas tempranas de riesgo psicosocial, y el fortalecimiento de la dimensión de Bienestar y Hábitos, que ahora integra una batería más amplia de preguntas sobre la vida cotidiana del estudiante.
 
-Siguiendo la vanguardia en el manejo de datos, este libro ha sido desarrollado bajo un ecosistema de Ciencia Abierta, utilizando herramientas de alto rendimiento como Python y Quarto. Este enfoque garantiza:
+Este libro se desarrolló bajo un enfoque de ciencia abierta, con herramientas reproducibles como R y Quarto. Este enfoque garantiza:
 
 -   **Trazabilidad: Cada cifra presentada tiene un respaldo directo en el diccionario de variables y los microdatos procesados.**
 
@@ -28,7 +28,7 @@ Siguiendo la vanguardia en el manejo de datos, este libro ha sido desarrollado b
 
 -   **Transparencia: El uso de código abierto asegura que la gestión de datos sea auditable y escalable.**
 
--   **Anonimización: Se mantiene la confidenciadad de la información de los participantes.**
+-   **Anonimización: se mantiene la confidencialidad de la información de los participantes.**
 
 El presente informe no solo busca describir a la cohorte 2026-1, sino servir como una herramienta de navegación para la toma de decisiones. A través de la integración de tablas dinámicas y visualizaciones avanzadas, las dependencias universitarias podrán identificar perfiles de riesgo, diseñar estrategias de nivelación académica y personalizar los servicios de Bienestar Institucional. En última instancia, esta caracterización es el compromiso de la UDES con una educación inclusiva, basada en la evidencia y centrada en el desarrollo humano integral.
 

@@ -193,6 +193,15 @@ img {
   }
 }
 
+.institutional-footer {
+  margin-top: 2rem;
+  padding: 1rem 0;
+  border-top: 1px solid #d9dee7;
+  color: #4b5563;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
 img[src*="cover.png"] {
   max-width: 100%;   /* Puedes usar 100% si quieres que llene todo el ancho disponible */
   height: auto;
