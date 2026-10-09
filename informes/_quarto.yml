@@ -1,0 +1,18 @@
+project:
+  type: default
+  output-dir: ../descargas
+
+lang: es
+
+format:
+  pdf:
+    pdf-engine: xelatex
+    documentclass: article
+    geometry:
+      - margin=2cm
+    colorlinks: true
+
+execute:
+  echo: false
+  warning: false
+  message: false

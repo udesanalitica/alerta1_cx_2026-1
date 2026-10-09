@@ -1,6 +1,8 @@
 project:
   type: book
   output-dir: docs
+  resources:
+    - descargas/*.pdf
 
 book:
   title: "Alerta 1. Caracterización de estudiantes"
@@ -33,6 +35,7 @@ book:
     - Seccion2.qmd
     - Seccion3.qmd
     - Seccion4.qmd
+    - Descargas.qmd
     - Conclusiones.qmd
 
 bibliography: references.bib

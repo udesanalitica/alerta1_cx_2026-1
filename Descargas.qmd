@@ -1,0 +1,11 @@
+---
+title: "Descargas"
+---
+
+En esta sección se encuentran los informes ejecutivos en PDF. Las publicaciones presentan resultados agregados y no contienen datos personales.
+
+- [Informe ejecutivo institucional](descargas/Informe_ejecutivo_institucional_2026-1.pdf){.btn .btn-primary download=""}
+- [Informe ejecutivo — Campus Bucaramanga](descargas/Informe_ejecutivo_Bucaramanga_2026-1.pdf){.btn .btn-outline-primary download=""}
+- [Informe ejecutivo — Campus Bogotá](descargas/Informe_ejecutivo_Bogota_2026-1.pdf){.btn .btn-outline-primary download=""}
+- [Informe ejecutivo — Campus Cúcuta](descargas/Informe_ejecutivo_Cucuta_2026-1.pdf){.btn .btn-outline-primary download=""}
+- [Informe ejecutivo — Campus Valledupar](descargas/Informe_ejecutivo_Valledupar_2026-1.pdf){.btn .btn-outline-primary download=""}

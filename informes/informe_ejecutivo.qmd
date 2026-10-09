@@ -1,0 +1,103 @@
+---
+title: "Informe ejecutivo de caracterización estudiantil"
+subtitle: "Periodo 2026-1"
+author: "Planeación Institucional — Universidad de Santander"
+params:
+  campus: "Todos"
+---
+
+```{r}
+library(readxl)
+library(dplyr)
+library(ggplot2)
+library(scales)
+library(knitr)
+
+invisible(try(Sys.setlocale("LC_CTYPE", "Spanish_Colombia.1252"), silent = TRUE))
+
+datos <- read_excel("../data/data20261.xlsx") %>%
+  mutate(campus = recode(as.character(campus), "Bogota" = "Bogotá"))
+
+campus_reporte <- params$campus
+base <- if (campus_reporte == "Todos") datos else filter(datos, campus == campus_reporte)
+n_estudiantes <- nrow(base)
+titulo_ambito <- if (campus_reporte == "Todos") "Institucional" else paste("Campus", campus_reporte)
+
+edad_num <- suppressWarnings(as.numeric(gsub(" años", "", base$edad)))
+edad_mediana <- median(edad_num, na.rm = TRUE)
+if (!is.finite(edad_mediana)) edad_mediana <- NA_real_
+
+top_programas <- base %>%
+  filter(!is.na(prog_acad), prog_acad != "") %>%
+  count(prog_acad, sort = TRUE, name = "Estudiantes") %>%
+  slice_head(n = 8) %>%
+  rename(Programa = prog_acad)
+```
+
+# `r titulo_ambito`
+
+## Resumen ejecutivo
+
+- La caracterización reúne **`r format(n_estudiantes, big.mark = ".", decimal.mark = ",")` estudiantes** del ámbito seleccionado.
+- La edad mediana es **`r ifelse(is.na(edad_mediana), "no calculable", paste0(edad_mediana, " años"))`**.
+- Los resultados describen la cohorte encuestada y no deben interpretarse como relaciones causales.
+- Las tablas y gráficas presentan datos agregados; no incluyen identificadores personales.
+
+## Programas con mayor participación
+
+```{r}
+kable(top_programas, booktabs = TRUE, longtable = FALSE)
+```
+
+```{r, fig.height=4.2, fig.width=7}
+ggplot(top_programas, aes(x = Estudiantes, y = reorder(Programa, Estudiantes))) +
+  geom_col(fill = "#315C8C") +
+  labs(x = "Estudiantes", y = NULL) +
+  theme_minimal(base_size = 10)
+```
+
+## Perfil demográfico
+
+```{r}
+perfil_genero <- base %>%
+  filter(!is.na(genero), genero != "") %>%
+  count(genero, name = "Estudiantes") %>%
+  mutate(Porcentaje = percent(Estudiantes / sum(Estudiantes), accuracy = 0.1, decimal.mark = ",")) %>%
+  arrange(desc(Estudiantes)) %>%
+  rename(Genero = genero)
+kable(perfil_genero, booktabs = TRUE)
+```
+
+## Condiciones de acompañamiento
+
+```{r}
+resumen_variable <- function(variable, etiqueta) {
+  base %>%
+    filter(!is.na(.data[[variable]]), .data[[variable]] != "") %>%
+    count(Respuesta = .data[[variable]], name = "Estudiantes") %>%
+    mutate(
+      Indicador = etiqueta,
+      Porcentaje = percent(Estudiantes / sum(Estudiantes), accuracy = 0.1, decimal.mark = ",")
+    ) %>%
+    arrange(desc(Estudiantes)) %>%
+    slice_head(n = 3) %>%
+    select(Indicador, Respuesta, Estudiantes, Porcentaje)
+}
+
+indicadores <- bind_rows(
+  resumen_variable("apoyo_fam", "Apoyo emocional familiar"),
+  resumen_variable("internet", "Acceso a internet"),
+  resumen_variable("salud_ment", "Percepción de salud mental")
+)
+kable(indicadores, booktabs = TRUE, longtable = FALSE)
+```
+
+## Orientaciones para la gestión
+
+1. Priorizar el acompañamiento de los grupos minoritarios o con respuestas desfavorables, usando listados nominales únicamente en entornos institucionales autorizados.
+2. Contrastar los hallazgos con permanencia, rendimiento y uso de servicios antes de atribuir causas.
+3. Definir acciones por programa cuando el volumen permita una lectura estable y evitar conclusiones basadas en grupos pequeños.
+
+## Nota metodológica
+
+Fuente: caracterización de estudiantes de recién ingreso, periodo 2026-1. Los porcentajes usan respuestas válidas como denominador; los valores faltantes no se convierten en cero. Fecha de elaboración: 9 de octubre de 2026.
