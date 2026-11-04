@@ -78,7 +78,7 @@ Por favor cite el dataset y el reporte como se muestra
   title        = {Documento de Planeación Institucional No 4. Caracterización de estudiantes presenciales de pregrado recién ingreso periodo 2026-1.},
   institution  = {Universidad de Santander (UDES)},
   year         = {2026},
-  note         = {Vicerrectoria de Enseñanza},
+  note         = {Planeación Institucional},
   url          = {https://udesanalitica.github.io/alerta1_cx_2026-1/},
   type         = {Informe técnico}
   doi          = {https://doi.org/10.5281/zenodo.19735820}
