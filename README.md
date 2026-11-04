@@ -51,7 +51,7 @@ install.packages(c(
 
 ## Navegación del sitio
 
-El sitio se encuentra publicado en: https://analiticaudes.github.io/alerta1_cx_2026-1/
+El sitio se encuentra publicado en: https://udesanalitica.github.io/alerta1_cx_2026-1/
 
 Secciones principales:
 ```
@@ -79,7 +79,7 @@ Por favor cite el dataset y el reporte como se muestra
   institution  = {Universidad de Santander (UDES)},
   year         = {2026},
   note         = {Vicerrectoria de Enseñanza},
-  url          = {https://analiticaudes.github.io/alerta1_cx_2026-1/},
+  url          = {https://udesanalitica.github.io/alerta1_cx_2026-1/},
   type         = {Informe técnico}
   doi          = {https://doi.org/10.5281/zenodo.19735820}
 }
